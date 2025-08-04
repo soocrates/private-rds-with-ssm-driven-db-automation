@@ -1,0 +1,73 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Crash log files
+crash.log
+
+# Override files which are usually local and not shared
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Terraform directory for modules/plugins
+.terraform/
+
+# Sensitive files
+*.tfvars.json
+*.auto.tfvars.json
+
+# Sensitive environment variable files
+.env
+.env.*
+
+# Editor and OS files
+
+# VS Code
+.vscode/
+
+# IntelliJ / JetBrains IDEs
+.idea/
+
+# macOS
+.DS_Store
+
+# Linux
+.*.swp
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# Logs
+*.log
+
+# Terraform plan output files
+*.plan
+
+# Terraform plugin cache (optional if used)
+.plugin-cache/
+
+# Terraform workspace files
+terraform.tfstate.backup
+
+# Terragrunt files (if you use terragrunt)
+.terragrunt-cache/
+
+# Local override files for sensitive settings
+local.auto.tfvars
+
+# Lock files (optional, usually safe to keep)
+.terraform.lock.hcl
