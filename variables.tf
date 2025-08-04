@@ -15,3 +15,8 @@ variable "region_short_name" {
   type        = string
   default     = "ue1"
 }
+variable "app_db_names" {
+  description = "List of application database names"
+  type        = list(string)
+  default     = ["db001", "db002", "db003", "db004"]
+}
