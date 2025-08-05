@@ -1,7 +1,8 @@
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
+  version = "6.0.0"
 
-  name = "${naming_prefix}-vpc"
+  name = "${local.naming_prefix}-vpc"
   cidr = local.vpc.vpc_cidr
 
   azs             = local.vpc.azs
@@ -16,7 +17,7 @@ module "vpc" {
 }
 
 resource "aws_security_group" "rds_sg" {
-  name        = "${naming_prefix}-db-sg"
+  name        = "${local.naming_prefix}-db-sg"
   description = "Allows PostgreSQL access"
   vpc_id      = module.vpc.vpc_id
 

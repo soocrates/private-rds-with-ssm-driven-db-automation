@@ -1,5 +1,4 @@
 data "aws_ami" "ubuntu_latest" {
-  description = "Fetches the most recent Ubuntu 22.04 LTS (Jammy) AMI with HVM and SSD support."
   most_recent = true
   owners      = ["099720109477"] 
   filter {

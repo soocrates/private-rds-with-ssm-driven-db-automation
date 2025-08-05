@@ -14,7 +14,7 @@ module "master_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
 
-  name_prefix             = "${naming_prefix}-master-db-secrets"
+  name_prefix             = "${local.naming_prefix}-master-db-secrets"
   description             = "Master DB credentials"
   recovery_window_in_days = 7
   enable_rotation         = false
@@ -46,7 +46,7 @@ module "app_db_secrets" {
 
   for_each = toset(var.app_db_names)
 
-  name_prefix             = "${naming_prefix}-${each.key}-db-secrets"
+  name_prefix             = "${local.naming_prefix}-${each.key}-db-secrets"
   description             = "App DB credentials for ${each.key}"
   recovery_window_in_days = 7
   enable_rotation         = false

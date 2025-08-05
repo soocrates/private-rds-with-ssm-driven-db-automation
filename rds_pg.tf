@@ -7,8 +7,8 @@ module "rds" {
   engine_version              = local.rds.engine_version
   family                      = local.rds.family
   port                        = local.rds.port
-  apply_immediately           = local.rds.port
-  publicly_accessible         = local.rds.apply_immediately
+  apply_immediately           = local.rds.apply_immediately
+  publicly_accessible         = local.rds.publicly_accessible
   create_db_subnet_group      = local.rds.create_db_subnet_group
   manage_master_user_password = local.rds.manage_master_user_password
   skip_final_snapshot         = local.rds.skip_final_snapshot

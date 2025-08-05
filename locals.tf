@@ -17,7 +17,7 @@ locals {
   }
 
   rds = {
-    identifier                  = "${naming_prefix}-rds-pg"
+    identifier                  = "${local.naming_prefix}-rds-pg"
     engine                      = "postgres"
     engine_version              = "14"
     family                      = "postgres14"
