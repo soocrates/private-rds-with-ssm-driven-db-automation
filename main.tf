@@ -12,7 +12,7 @@ resource "aws_instance" "rds_connector" {
     delete_on_termination = true
   }
   tags = {
-    Name= "${local.naming_prefix}-rds-connector"
+    Name = "${local.naming_prefix}-rds-connector"
   }
   depends_on = [module.rds]
 }
