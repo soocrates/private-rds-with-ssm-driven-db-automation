@@ -9,7 +9,6 @@ module "rds" {
   port                        = local.rds.port
   apply_immediately           = local.rds.apply_immediately
   publicly_accessible         = local.rds.publicly_accessible
-  create_db_subnet_group      = local.rds.create_db_subnet_group
   manage_master_user_password = local.rds.manage_master_user_password
   skip_final_snapshot         = local.rds.skip_final_snapshot
 
@@ -22,6 +21,6 @@ module "rds" {
 
   subnet_ids             = local.rds.subnet_ids
   vpc_security_group_ids = local.rds.vpc_security_group_ids
-  db_subnet_group_name   = local.rds.db_subnet_group_name
+  create_db_subnet_group = local.rds.create_db_subnet_group
 
 }

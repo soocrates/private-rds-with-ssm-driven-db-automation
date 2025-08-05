@@ -24,7 +24,6 @@ locals {
     port                        = "5432"
     apply_immediately           = true
     publicly_accessible         = false
-    create_db_subnet_group      = false
     manage_master_user_password = false
     skip_final_snapshot         = true
 
@@ -37,6 +36,6 @@ locals {
 
     subnet_ids             = [for subnet_id in module.vpc.private_subnets : subnet_id]
     vpc_security_group_ids = [aws_security_group.rds_sg.id]
-    db_subnet_group_name   = module.vpc.database_subnet_group
+    create_db_subnet_group = true
   }
 }
