@@ -29,3 +29,34 @@ resource "aws_instance" "rds_connector" {
 
   depends_on = [module.rds]
 }
+
+resource "null_resource" "configure_instance" {
+  triggers = {
+    instance_id   = aws_instance.rds_connector.id
+    document_hash = sha256(aws_ssm_document.install_tools.content)
+  }
+
+  depends_on = [
+    aws_instance.rds_connector,
+    module.rds
+  ]
+
+  provisioner "local-exec" {
+    command     = <<-EOT
+      #!/bin/bash
+      set -e
+      echo ">>> STAGE 1: Configuring instance ${self.triggers.instance_id} with required tools..."
+      COMMAND_ID=$(aws ssm send-command --instance-ids "${self.triggers.instance_id}" --document-name "${aws_ssm_document.install_tools.name}" --query "Command.CommandId" --output text)
+      echo "Configuration command sent. Waiting for completion... (Command ID: $COMMAND_ID)"
+      aws ssm wait command-executed --command-id $COMMAND_ID --instance-id "${self.triggers.instance_id}"
+      STATUS=$(aws ssm list-command-invocations --command-id $COMMAND_ID --details --query "CommandInvocations[0].Status" --output text)
+      if [ "$STATUS" != "Success" ]; then
+        echo "ERROR: Instance configuration failed with status: $STATUS"
+        aws ssm get-command-invocation --command-id $COMMAND_ID --instance-id "${self.triggers.instance_id}" --query "StandardErrorContent" --output text
+        exit 1
+      fi
+      echo ">>> STAGE 1: Instance configuration successful. <<<"
+    EOT
+    interpreter = ["bash", "-c"]
+  }
+}
