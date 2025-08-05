@@ -60,3 +60,53 @@ resource "null_resource" "configure_instance" {
     interpreter = ["bash", "-c"]
   }
 }
+
+resource "null_resource" "invoke_db_creator" {
+  for_each = toset(var.app_db_names)
+
+  triggers = {
+    instance_id   = aws_instance.rds_connector.id
+    db_name       = each.key
+    db_host       = module.rds.db_instance_address
+    document_hash = sha256(aws_ssm_document.db_creator.content)
+    app_secret    = module.app_db_secrets[each.key].secret_arn
+    master_secret = module.master_secret.secret_arn
+  }
+
+  depends_on = [
+    null_resource.configure_instance,
+    aws_instance.rds_connector,
+    module.rds,
+    module.app_db_secrets,
+    module.master_secret,
+    aws_ssm_document.db_creator
+  ]
+
+  provisioner "local-exec" {
+    command     = <<-EOT
+      #!/bin/bash
+      set -e
+      echo ">>> STAGE 2: Sending command for database: ${self.triggers.db_name}..."
+
+      COMMAND_ID=$(aws ssm send-command \
+        --instance-ids "${self.triggers.instance_id}" \
+        --document-name "${aws_ssm_document.db_creator.name}" \
+        --parameters "NewDBName=['${self.triggers.db_name}'],NewUserPasswordSecretArn=['${self.triggers.app_secret}'],MasterSecretArn=['${self.triggers.master_secret}'],DBHost=['${self.triggers.db_host}']" \
+        --query "Command.CommandId" \
+        --output text)
+
+      echo "Waiting for DB creation for ${self.triggers.db_name}... (Command ID: $COMMAND_ID)"
+      aws ssm wait command-executed --command-id $COMMAND_ID --instance-id "${self.triggers.instance_id}"
+
+      STATUS=$(aws ssm list-command-invocations --command-id $COMMAND_ID --details --query "CommandInvocations[0].Status" --output text)
+      if [ "$STATUS" != "Success" ]; then
+          echo "ERROR: DB creation command failed for ${self.triggers.db_name} with status: $STATUS"
+          aws ssm get-command-invocation --command-id $COMMAND_ID --instance-id "${self.triggers.instance_id}" --query "StandardErrorContent" --output text
+          exit 1
+      fi
+
+      echo ">>> STAGE 2: Database ${self.triggers.db_name} created successfully. <<<"
+    EOT
+    interpreter = ["bash", "-c"]
+  }
+}
